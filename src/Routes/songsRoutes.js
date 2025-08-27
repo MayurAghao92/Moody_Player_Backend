@@ -1,6 +1,6 @@
 import express from 'express';
 import multer from 'multer';
-import song from '../models/songModel.js';
+import songModel from '../models/songModel.js';
 import uploadFile from '../service/storage.service.js'
 
 const upload=multer({storage:multer.memoryStorage()})
@@ -11,11 +11,18 @@ router.post('/songs',upload.single('audio'),async(req,res)=>{
     console.log(req.body);
     console.log(req.file);
     const filedata=await uploadFile(req.file)
-    console.log("Filedata:", JSON.stringify(filedata, null, 2));
+    // console.log(filedata);
+
+    const song = await songModel.create({
+        title:req.body.title,
+        artist:req.body.artist,
+        audio:filedata.url,
+        mood:req.body.mood,
+    })
+
     res.status(201).json({
         message:"file created successfully",
-        song:req.body,
-        filedata:filedata
+        song:song,
     })
 })
 
